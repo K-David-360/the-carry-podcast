@@ -38,9 +38,9 @@ from dotenv import load_dotenv
 from pipeline_utils import read_state, write_state, load_gir_content, parse_alphaville_rss
 from notebooklm_utils import generate_podcast_audio, delete_notebook
 from github_utils import (
-    gh_put_large_file, gh_get_file, gh_put_file, gh_get_sha, gh_delete_file,
-    build_item, remove_old_items, indent_xml,
-    BASE_URL, AUDIO_DIR, FEED_PATH, RETENTION_DAYS,
+    gh_put_large_file, gh_get_file, gh_put_file,
+    build_item, indent_xml,
+    BASE_URL, AUDIO_DIR, FEED_PATH,
 )
 
 load_dotenv(Path(__file__).parent / ".env")
@@ -129,15 +129,6 @@ def publish_to_github(m4a_path: Path, title: str, description: str, date_str: st
     children = list(channel)
     first_item_idx = next((i for i, c in enumerate(children) if c.tag == "item"), len(children))
     channel.insert(first_item_idx, new_item)
-
-    cutoff = datetime.now(tz=timezone.utc) - timedelta(days=RETENTION_DAYS)
-    stale = remove_old_items(channel, cutoff)
-    if stale:
-        log.info("Removing %d expired episode(s): %s", len(stale), stale)
-        for fname in stale:
-            stale_sha = gh_get_sha(f"{AUDIO_DIR}/{fname}")
-            if stale_sha:
-                gh_delete_file(f"{AUDIO_DIR}/{fname}", stale_sha, f"Remove expired {fname}")
 
     indent_xml(root)
     updated_feed = '<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(

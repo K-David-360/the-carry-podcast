@@ -26,7 +26,7 @@ BASE_URL = "https://k-david-360.github.io/the-carry-podcast"
 API_BASE = f"https://api.github.com/repos/{REPO}/contents"
 FEED_PATH = "feed.xml"
 AUDIO_DIR = "audio"
-RETENTION_DAYS = 30
+RETENTION_DAYS = None  # keep all episodes
 
 ET.register_namespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd")
 ET.register_namespace("atom", "http://www.w3.org/2005/Atom")
