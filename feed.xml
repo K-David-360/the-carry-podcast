@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+  xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+  xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>The Carry</title>
+    <description>Goldman Sachs research intelligence meets FT Alphaville. Weekly financial analysis with a dry wit.</description>
+    <link>https://k-david-360.github.io/the-carry-podcast/</link>
+    <language>en-us</language>
+    <atom:link href="https://k-david-360.github.io/the-carry-podcast/feed.xml" rel="self" type="application/rss+xml"/>
+    <itunes:author>The Carry</itunes:author>
+    <itunes:category text="Business">
+      <itunes:category text="Investing"/>
+    </itunes:category>
+    <itunes:explicit>no</itunes:explicit>
+  </channel>
+</rss>
