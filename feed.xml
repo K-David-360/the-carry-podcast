@@ -14,5 +14,14 @@
     </itunes:category>
     <itunes:explicit>no</itunes:explicit>
     <itunes:image href="https://k-david-360.github.io/the-carry-podcast/assets/cover.png"/>
+    <item>
+      <title>The Carry — Coming Soon</title>
+      <description>Placeholder episode. First real episode coming shortly.</description>
+      <enclosure url="https://k-david-360.github.io/the-carry-podcast/audio/placeholder.m4a" length="2560" type="audio/mp4"/>
+      <guid isPermaLink="false">the-carry-placeholder</guid>
+      <pubDate>Sat, 14 Jun 2025 06:30:00 -0500</pubDate>
+      <itunes:duration>00:00:05</itunes:duration>
+      <itunes:summary>Placeholder episode. First real episode coming shortly.</itunes:summary>
+    </item>
   </channel>
 </rss>
