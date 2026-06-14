@@ -79,9 +79,10 @@ async def generate_podcast_audio(
         notebook_id = nb.id
         log.info("Notebook created: %s", notebook_id)
 
-        log.info("Adding GIR content (%d chars)", len(gir_content))
-        await c.sources.add_text(notebook_id, gir_content, wait=True)
-        log.info("GIR source added")
+        if gir_content:
+            log.info("Adding GIR content (%d chars)", len(gir_content))
+            await c.sources.add_text(notebook_id, gir_content, wait=True)
+            log.info("GIR source added")
 
         if alphaville_url:
             log.info("Adding Alphaville URL: %s", alphaville_url)
@@ -117,7 +118,7 @@ async def generate_podcast_audio(
                             attempt + 1, MAX_RETRIES, wait, exc)
                 await asyncio.sleep(wait)
 
-        if not final.is_complete:
+        if final is None or not final.is_complete:
             raise RuntimeError(f"Audio did not complete. Status: {final.status}")
 
         log.info("Audio generation complete")
