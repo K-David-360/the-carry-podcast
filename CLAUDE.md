@@ -36,7 +36,7 @@
 | `tests/test_finance_pipeline.py` | Integration tests: pipeline orchestration (all external calls mocked) |
 | `gir_emails/` | Daily GIR text files (gitignored) |
 | `state.json` | Last-processed Alphaville GUID + last run date (gitignored) |
-| `.env` | `GMAIL_USER`, `GMAIL_APP_PASSWORD`, `GITHUB_TOKEN`, `ANTHROPIC_API_KEY` (gitignored) |
+| `.env` | `GMAIL_USER`, `GMAIL_APP_PASSWORD`, `GITHUB_TOKEN` (gitignored) |
 | `.env.example` | Template for .env |
 | `pipeline.log` | Run log (gitignored) |
 | `CLAUDE.md` | This file |
@@ -70,7 +70,6 @@ Copy `.env.example` to `.env` and fill in:
 GMAIL_USER=your-dedicated-gmail@gmail.com
 GMAIL_APP_PASSWORD=xxxx-xxxx-xxxx-xxxx   # Google App Password, not account password
 GITHUB_TOKEN=ghp_...
-ANTHROPIC_API_KEY=sk-ant-...
 ```
 
 **Gmail IMAP:** Enable IMAP in Gmail settings. Create an App Password at Google Account → Security → App Passwords.
