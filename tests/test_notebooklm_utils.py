@@ -29,7 +29,7 @@ async def test_generate_audio_adds_both_sources(tmp_path):
     output_path.write_bytes(b"fake")
 
     audio_title, notebook_id = await generate_podcast_audio(
-        gir_content="GS market intelligence",
+        gir_content="institutional market intelligence",
         alphaville_url="https://ftav.substack.com/p/test",
         title="The Carry — Test",
         output_path=output_path,
@@ -52,7 +52,7 @@ async def test_generate_audio_gir_only_skips_add_url(tmp_path):
     output_path.write_bytes(b"fake")
 
     await generate_podcast_audio(
-        gir_content="GS content only",
+        gir_content="research content only",
         alphaville_url=None,
         title="The Carry — GIR Only",
         output_path=output_path,

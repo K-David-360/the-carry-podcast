@@ -44,7 +44,7 @@ def load_gir_content(gir_dir: Path, reference_date: Optional[date] = None) -> Op
 
     parts: list[str] = []
     for day, path in files:
-        parts.append(f"=== Goldman Sachs Market Intelligence — {day.strftime('%A, %B %d, %Y')} ===")
+        parts.append(f"=== Institutional Market Intelligence — {day.strftime('%A, %B %d, %Y')} ===")
         parts.append(path.read_text(encoding="utf-8").strip())
         parts.append("")
     return "\n\n".join(parts)

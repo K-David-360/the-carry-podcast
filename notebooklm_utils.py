@@ -13,7 +13,7 @@ from notebooklm.exceptions import NetworkError
 log = logging.getLogger(__name__)
 
 AUDIO_PROMPT = """\
-Host format: Two hosts — one speaks from the Goldman Sachs analyst lens (data, positioning, \
+Host format: Two hosts — one speaks from the institutional analyst lens (data, positioning, \
 model-driven views), the other from FT Alphaville's tradition (wry, skeptical of consensus, \
 comfortable calling out when something is strange or overdone). Tone is dry and intelligent — \
 Bloomberg Odd Lots, not CNBC. Assume a financially literate audience.
@@ -24,7 +24,7 @@ Structure:
 material — a number that surprises, a narrative that doesn't hold together, or a call that \
 deserves scrutiny. No "welcome to" boilerplate.
 
-2. GS intelligence layer (3–4 min): Walk through key themes from the Goldman Sachs research. \
+2. Research intelligence layer (3–4 min): Walk through key themes from the institutional research. \
 One host presents the data-driven view. The other probes: what's the model missing? What's the \
 consensus, and why might it be wrong?
 

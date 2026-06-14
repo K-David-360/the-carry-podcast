@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-collect_gir.py — Daily GIR email collector.
+collect_gir.py — Daily research email collector.
 
 Polls a dedicated Gmail inbox via IMAP for unread messages from
-@alerts.publishing.gs.com, extracts the text body, and saves each as
-gir_emails/YYYY-MM-DD.txt (appending if multiple arrive on the same day).
+the configured research sender domain, extracts the text body, and saves each as
+research_emails/YYYY-MM-DD.txt (appending if multiple arrive on the same day).
 
 Usage:
     python collect_gir.py
@@ -110,7 +110,7 @@ def collect_gir_emails(
     gmail_password: str = GMAIL_APP_PASSWORD,
     gir_dir: Path = GIR_EMAIL_DIR,
 ) -> int:
-    """Connect to Gmail IMAP, fetch unseen GS emails, save to gir_dir. Returns count saved."""
+    """Connect to Gmail IMAP, fetch unseen research emails, save to gir_dir. Returns count saved."""
     if not gmail_user or not gmail_password:
         raise RuntimeError("GMAIL_USER and GMAIL_APP_PASSWORD must be set in .env")
 

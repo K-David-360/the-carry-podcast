@@ -3,8 +3,8 @@
 finance_pipeline.py — Weekly "The Carry" podcast pipeline.
 
 1. Check FT Alphaville Substack RSS for a new post this week
-2. Load this week's GIR email files
-3. Create NotebookLM notebook with both sources (or GIR-only)
+2. Load this week's research emails
+3. Create NotebookLM notebook with both sources (or research-only)
 4. Generate and download audio
 5. Remux → GitHub upload → feed.xml update
 6. Update state.json
@@ -185,8 +185,8 @@ def run_pipeline(dry_run: bool = False) -> bool:
         episode_title = f"The Carry: {alphaville_title}"
         description = f"{alphaville_title} — FT Alphaville. Week of {date_str}."
     else:
-        episode_title = f"The Carry — GS Intelligence {date_str}"
-        description = f"Goldman Sachs market intelligence. Week of {date_str}."
+        episode_title = f"The Carry — Market Intelligence {date_str}"
+        description = f"Institutional market intelligence. Week of {date_str}."
 
     log.info("Episode: %s", episode_title)
 

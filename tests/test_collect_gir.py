@@ -11,8 +11,8 @@ from collect_gir import extract_body, get_email_date, save_email
 
 def make_plain_email(body: str, date_str: str = "Thu, 11 Jun 2026 06:00:00 +0000") -> email.message.Message:
     msg = email.message.EmailMessage()
-    msg["From"] = "noreply@alerts.publishing.gs.com"
-    msg["Subject"] = "GS Market Intelligence"
+    msg["From"] = "noreply@research.example.com"
+    msg["Subject"] = "Research Intelligence"
     msg["Date"] = date_str
     msg.set_content(body)
     return msg
@@ -20,8 +20,8 @@ def make_plain_email(body: str, date_str: str = "Thu, 11 Jun 2026 06:00:00 +0000
 
 def make_html_email(html: str, date_str: str = "Thu, 11 Jun 2026 06:00:00 +0000") -> email.message.Message:
     msg = email.mime.multipart.MIMEMultipart("alternative")
-    msg["From"] = "noreply@alerts.publishing.gs.com"
-    msg["Subject"] = "GS Market Intelligence"
+    msg["From"] = "noreply@research.example.com"
+    msg["Subject"] = "Research Intelligence"
     msg["Date"] = date_str
     msg.attach(email.mime.text.MIMEText(html, "html"))
     return msg
