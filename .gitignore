@@ -1,0 +1,8 @@
+.env
+gir_emails/*.txt
+state.json
+pipeline.log
+__pycache__/
+*.pyc
+.venv/
+*.raw
