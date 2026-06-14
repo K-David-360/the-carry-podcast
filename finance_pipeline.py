@@ -170,7 +170,7 @@ def run_pipeline(dry_run: bool = False) -> bool:
 
     if alphaville_title and gir_content:
         episode_title = f"The Carry: {alphaville_title}"
-        description = (f"{alphaville_title} — GS research intelligence + FT Alphaville. "
+        description = (f"{alphaville_title} — Institutional research + FT Alphaville. "
                        f"Week of {date_str}.")
     elif alphaville_title:
         episode_title = f"The Carry: {alphaville_title}"
