@@ -1,0 +1,173 @@
+#!/usr/bin/env python3
+"""
+collect_gir.py — Daily GIR email collector.
+
+Polls a dedicated Gmail inbox via IMAP for unread messages from
+@alerts.publishing.gs.com, extracts the text body, and saves each as
+gir_emails/YYYY-MM-DD.txt (appending if multiple arrive on the same day).
+
+Usage:
+    python collect_gir.py
+
+Cron (Pi, Mon–Fri 6am Central, set TZ=America/Chicago in crontab):
+    0 6 * * 1-5 /home/pi/the-carry-podcast/.venv/bin/python3 \
+        /home/pi/the-carry-podcast/collect_gir.py >> \
+        /home/pi/the-carry-podcast/pipeline.log 2>&1
+"""
+
+import email
+import email.message
+import imaplib
+import logging
+import os
+import sys
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
+from pathlib import Path
+
+from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).parent / ".env")
+
+GMAIL_USER = os.getenv("GMAIL_USER", "")
+GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
+GIR_SENDER_DOMAIN = "alerts.publishing.gs.com"
+GIR_EMAIL_DIR = Path(__file__).parent / "gir_emails"
+IMAP_HOST = "imap.gmail.com"
+IMAP_PORT = 993
+
+LOG_FILE = Path(__file__).parent / "pipeline.log"
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s  %(levelname)-8s  %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=[logging.FileHandler(LOG_FILE, encoding="utf-8")],
+)
+log = logging.getLogger(__name__)
+
+
+def extract_body(msg: email.message.Message) -> str:
+    """Extract plain text from an email, stripping HTML if no plain-text part exists."""
+    plain_parts: list[str] = []
+    html_parts: list[str] = []
+
+    if msg.is_multipart():
+        for part in msg.walk():
+            ct = part.get_content_type()
+            if "attachment" in str(part.get("Content-Disposition", "")):
+                continue
+            payload = part.get_payload(decode=True)
+            if not payload:
+                continue
+            charset = part.get_content_charset() or "utf-8"
+            text = payload.decode(charset, errors="replace")
+            if ct == "text/plain":
+                plain_parts.append(text)
+            elif ct == "text/html":
+                html_parts.append(text)
+    else:
+        payload = msg.get_payload(decode=True)
+        if payload:
+            charset = msg.get_content_charset() or "utf-8"
+            text = payload.decode(charset, errors="replace")
+            if msg.get_content_type() == "text/html":
+                html_parts.append(text)
+            else:
+                plain_parts.append(text)
+
+    if plain_parts:
+        return "\n\n".join(plain_parts).strip()
+    if html_parts:
+        return BeautifulSoup("\n\n".join(html_parts), "html.parser").get_text(
+            separator="\n", strip=True
+        )
+    return ""
+
+
+def get_email_date(msg: email.message.Message) -> str:
+    """Return YYYY-MM-DD from email Date header, falling back to today (UTC)."""
+    try:
+        return parsedate_to_datetime(msg.get("Date", "")).strftime("%Y-%m-%d")
+    except Exception:
+        return datetime.now(tz=timezone.utc).strftime("%Y-%m-%d")
+
+
+def save_email(date_str: str, body: str, gir_dir: Path) -> None:
+    """Save or append email body to gir_dir/YYYY-MM-DD.txt."""
+    gir_dir.mkdir(parents=True, exist_ok=True)
+    path = gir_dir / f"{date_str}.txt"
+    separator = "\n\n--- (additional message) ---\n\n" if path.exists() else ""
+    with open(path, "a", encoding="utf-8") as f:
+        f.write(separator + body)
+    log.info("Saved GIR email for %s (%d chars) → %s", date_str, len(body), path.name)
+
+
+def collect_gir_emails(
+    imap_host: str = IMAP_HOST,
+    imap_port: int = IMAP_PORT,
+    gmail_user: str = GMAIL_USER,
+    gmail_password: str = GMAIL_APP_PASSWORD,
+    gir_dir: Path = GIR_EMAIL_DIR,
+) -> int:
+    """Connect to Gmail IMAP, fetch unseen GS emails, save to gir_dir. Returns count saved."""
+    if not gmail_user or not gmail_password:
+        raise RuntimeError("GMAIL_USER and GMAIL_APP_PASSWORD must be set in .env")
+
+    log.info("Connecting to %s:%d as %s", imap_host, imap_port, gmail_user)
+    mail = imaplib.IMAP4_SSL(imap_host, imap_port)
+    mail.login(gmail_user, gmail_password)
+
+    try:
+        mail.select("INBOX")
+        status, message_ids = mail.search(None, f'(UNSEEN FROM "{GIR_SENDER_DOMAIN}")')
+        if status != "OK":
+            log.warning("IMAP search returned non-OK status: %s", status)
+            return 0
+
+        ids = [i for i in message_ids[0].split() if i]
+        log.info("Found %d unseen GIR message(s)", len(ids))
+
+        saved = 0
+        for msg_id in ids:
+            fetch_status, msg_data = mail.fetch(msg_id, "(RFC822)")
+            if fetch_status != "OK" or not msg_data or not msg_data[0]:
+                log.warning("Failed to fetch message %s", msg_id)
+                continue
+
+            msg = email.message_from_bytes(msg_data[0][1])
+            body = extract_body(msg)
+
+            if not body:
+                log.warning("Empty body for message %s, skipping", msg_id)
+                mail.store(msg_id, "+FLAGS", "\\Seen")
+                continue
+
+            date_str = get_email_date(msg)
+            subject = msg.get("Subject", "(no subject)")
+            log.info("Processing: %s [%s]", subject[:80], date_str)
+
+            save_email(date_str, body, gir_dir)
+            mail.store(msg_id, "+FLAGS", "\\Seen")
+            saved += 1
+
+        return saved
+
+    finally:
+        mail.logout()
+
+
+def main() -> None:
+    log.info("=" * 50)
+    log.info("collect_gir.py starting")
+    log.info("=" * 50)
+    try:
+        count = collect_gir_emails()
+        log.info("Done. Saved %d GIR email(s).", count)
+    except Exception as exc:
+        log.error("collect_gir failed: %s", exc, exc_info=True)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
