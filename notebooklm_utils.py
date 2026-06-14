@@ -20,9 +20,10 @@ Bloomberg Odd Lots, not CNBC. Assume a financially literate audience.
 
 Structure:
 
-1. Cold open (30 sec): Drop into the most interesting tension or data point from this week's \
-material — a number that surprises, a narrative that doesn't hold together, or a call that \
-deserves scrutiny. No "welcome to" boilerplate.
+1. Cold open (30 sec): Open with "Welcome to The Carry. We read the research so you don't have \
+to — and then argue about it anyway." Then drop immediately into the most interesting tension or \
+data point from this week's material — a number that surprises, a narrative that doesn't hold \
+together, or a call that deserves scrutiny.
 
 2. Research intelligence layer (3–4 min): Walk through key themes from the institutional research. \
 One host presents the data-driven view. The other probes: what's the model missing? What's the \
