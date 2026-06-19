@@ -1,23 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0"
-  xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
-  xmlns:atom="http://www.w3.org/2005/Atom">
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
   <channel>
     <title>The Carry</title>
     <description>Weekly market intelligence from the institutional sell-side research desk to the FT Alphaville comment section.</description>
     <link>https://k-david-360.github.io/the-carry-podcast/</link>
     <language>en-us</language>
-    <atom:link href="https://k-david-360.github.io/the-carry-podcast/feed.xml" rel="self" type="application/rss+xml"/>
+    <atom:link href="https://k-david-360.github.io/the-carry-podcast/feed.xml" rel="self" type="application/rss+xml" />
     <itunes:author>The Carry</itunes:author>
     <itunes:category text="Business">
-      <itunes:category text="Investing"/>
+      <itunes:category text="Investing" />
     </itunes:category>
     <itunes:explicit>no</itunes:explicit>
-    <itunes:image href="https://k-david-360.github.io/the-carry-podcast/assets/cover.png"/>
+    <itunes:image href="https://k-david-360.github.io/the-carry-podcast/assets/cover.png" />
+    <item>
+      <title>The Carry: Building castles in the sky, one new share at a time: How companies fund growth with fantasy paper</title>
+      <description>Building castles in the sky, one new share at a time — Institutional research + FT Alphaville. Week of 2026-06-19.</description>
+      <enclosure url="https://k-david-360.github.io/the-carry-podcast/audio/the-carry-2026-06-19.m4a" length="42131736" type="audio/mp4" />
+      <guid isPermaLink="false">the-carry-2026-06-19</guid>
+      <pubDate>Fri, 19 Jun 2026 06:30:00 -0500</pubDate>
+      <itunes:duration>00:21:49</itunes:duration>
+      <itunes:summary>Building castles in the sky, one new share at a time — Institutional research + FT Alphaville. Week of 2026-06-19.</itunes:summary>
+    </item>
     <item>
       <title>The Carry — Coming Soon</title>
       <description>Placeholder episode. First real episode coming shortly.</description>
-      <enclosure url="https://k-david-360.github.io/the-carry-podcast/audio/placeholder.m4a" length="2560" type="audio/mp4"/>
+      <enclosure url="https://k-david-360.github.io/the-carry-podcast/audio/placeholder.m4a" length="2560" type="audio/mp4" />
       <guid isPermaLink="false">the-carry-placeholder</guid>
       <pubDate>Sat, 14 Jun 2025 06:30:00 -0500</pubDate>
       <itunes:duration>00:00:05</itunes:duration>
