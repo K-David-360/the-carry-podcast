@@ -18,6 +18,7 @@ Cron (Pi, Mon–Fri 6am Central, set TZ=America/Chicago in crontab):
 import email
 import email.message
 import imaplib
+import json
 import logging
 import os
 import sys
@@ -34,6 +35,7 @@ GMAIL_USER = os.getenv("GMAIL_USER", "")
 GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
 GIR_SENDER_DOMAIN = "alerts.publishing.gs.com"
 GIR_EMAIL_DIR = Path(__file__).parent / "gir_emails"
+STATE_FILE = Path(__file__).parent / "state.json"
 IMAP_HOST = "imap.gmail.com"
 IMAP_PORT = 993
 
@@ -103,6 +105,19 @@ def save_email(date_str: str, body: str, gir_dir: Path) -> None:
     log.info("Saved GIR email for %s (%d chars) → %s", date_str, len(body), path.name)
 
 
+def _load_seen_ids() -> set:
+    if STATE_FILE.exists():
+        data = json.loads(STATE_FILE.read_text())
+        return set(data.get("seen_gir_message_ids", []))
+    return set()
+
+
+def _save_seen_ids(seen: set) -> None:
+    data = json.loads(STATE_FILE.read_text()) if STATE_FILE.exists() else {}
+    data["seen_gir_message_ids"] = sorted(seen)
+    STATE_FILE.write_text(json.dumps(data, indent=2))
+
+
 def collect_gir_emails(
     imap_host: str = IMAP_HOST,
     imap_port: int = IMAP_PORT,
@@ -110,9 +125,11 @@ def collect_gir_emails(
     gmail_password: str = GMAIL_APP_PASSWORD,
     gir_dir: Path = GIR_EMAIL_DIR,
 ) -> int:
-    """Connect to Gmail IMAP, fetch unseen research emails, save to gir_dir. Returns count saved."""
+    """Connect to Gmail IMAP, fetch new research emails, save to gir_dir. Returns count saved."""
     if not gmail_user or not gmail_password:
         raise RuntimeError("GMAIL_USER and GMAIL_APP_PASSWORD must be set in .env")
+
+    seen_ids = _load_seen_ids()
 
     log.info("Connecting to %s:%d as %s", imap_host, imap_port, gmail_user)
     mail = imaplib.IMAP4_SSL(imap_host, imap_port)
@@ -120,13 +137,14 @@ def collect_gir_emails(
 
     try:
         mail.select("INBOX")
-        status, message_ids = mail.search(None, f'(UNSEEN FROM "{GIR_SENDER_DOMAIN}")')
+        # Search ALL (not UNSEEN) — Gmail marks auto-forwarded emails as read
+        status, message_ids = mail.search(None, f'(FROM "{GIR_SENDER_DOMAIN}")')
         if status != "OK":
             log.warning("IMAP search returned non-OK status: %s", status)
             return 0
 
         ids = [i for i in message_ids[0].split() if i]
-        log.info("Found %d unseen GIR message(s)", len(ids))
+        log.info("Found %d total GIR message(s) in inbox", len(ids))
 
         saved = 0
         for msg_id in ids:
@@ -136,11 +154,18 @@ def collect_gir_emails(
                 continue
 
             msg = email.message_from_bytes(msg_data[0][1])
+            message_id = msg.get("Message-ID", "").strip()
+
+            if message_id and message_id in seen_ids:
+                log.info("Already processed Message-ID %s, skipping", message_id[:60])
+                continue
+
             body = extract_body(msg)
 
             if not body:
                 log.warning("Empty body for message %s, skipping", msg_id)
-                mail.store(msg_id, "+FLAGS", "\\Seen")
+                if message_id:
+                    seen_ids.add(message_id)
                 continue
 
             date_str = get_email_date(msg)
@@ -148,9 +173,11 @@ def collect_gir_emails(
             log.info("Processing: %s [%s]", subject[:80], date_str)
 
             save_email(date_str, body, gir_dir)
-            mail.store(msg_id, "+FLAGS", "\\Seen")
+            if message_id:
+                seen_ids.add(message_id)
             saved += 1
 
+        _save_seen_ids(seen_ids)
         return saved
 
     finally:

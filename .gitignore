@@ -1,4 +1,5 @@
 .env
+.notebooklm/
 gir_emails/*.txt
 state.json
 pipeline.log
