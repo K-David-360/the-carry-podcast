@@ -82,7 +82,7 @@ async def generate_podcast_audio(
 
         if gir_content:
             log.info("Adding GIR content (%d chars)", len(gir_content))
-            await c.sources.add_text(notebook_id, gir_content, wait=True)
+            await c.sources.add_text(notebook_id, "Institutional Research", gir_content, wait=True)
             log.info("GIR source added")
 
         if alphaville_url:
