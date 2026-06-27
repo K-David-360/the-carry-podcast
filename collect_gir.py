@@ -22,7 +22,7 @@ import json
 import logging
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 
@@ -118,6 +118,18 @@ def _save_seen_ids(seen: set) -> None:
     STATE_FILE.write_text(json.dumps(data, indent=2))
 
 
+def _get_consecutive_failures() -> int:
+    if STATE_FILE.exists():
+        return json.loads(STATE_FILE.read_text()).get("gir_consecutive_failures", 0)
+    return 0
+
+
+def _set_consecutive_failures(n: int) -> None:
+    data = json.loads(STATE_FILE.read_text()) if STATE_FILE.exists() else {}
+    data["gir_consecutive_failures"] = n
+    STATE_FILE.write_text(json.dumps(data, indent=2))
+
+
 def collect_gir_emails(
     imap_host: str = IMAP_HOST,
     imap_port: int = IMAP_PORT,
@@ -137,8 +149,10 @@ def collect_gir_emails(
 
     try:
         mail.select("INBOX")
-        # Search ALL (not UNSEEN) — Gmail marks auto-forwarded emails as read
-        status, message_ids = mail.search(None, f'(FROM "{GIR_SENDER_DOMAIN}")')
+        # Search only the past 7 days — Gmail marks auto-forwarded emails as read so
+        # we can't use UNSEEN; seen_ids deduplication handles skipping already-processed mail.
+        since = (datetime.now(tz=timezone.utc) - timedelta(days=7)).strftime("%d-%b-%Y")
+        status, message_ids = mail.search(None, f'(FROM "{GIR_SENDER_DOMAIN}" SINCE {since})')
         if status != "OK":
             log.warning("IMAP search returned non-OK status: %s", status)
             return 0
@@ -190,9 +204,20 @@ def main() -> None:
     log.info("=" * 50)
     try:
         count = collect_gir_emails()
+        _set_consecutive_failures(0)
         log.info("Done. Saved %d GIR email(s).", count)
     except Exception as exc:
+        failures = _get_consecutive_failures() + 1
+        _set_consecutive_failures(failures)
         log.error("collect_gir failed: %s", exc, exc_info=True)
+        if failures >= 3:
+            log.critical(
+                "ACTION REQUIRED: collect_gir has failed %d consecutive times. "
+                "Check that the Gmail App Password for %s is still valid — "
+                "it may need to be regenerated at myaccount.google.com.",
+                failures,
+                GMAIL_USER,
+            )
         sys.exit(1)
 
 
