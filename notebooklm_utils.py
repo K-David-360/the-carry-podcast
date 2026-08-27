@@ -44,7 +44,27 @@ Style rules:
 * When the data is weird, say it's weird. Do not normalize everything.
 * Short sentences. No jargon without a quick definition.
 * The hosts should occasionally disagree — not for drama, but because smart people reading the \
-same data sometimes do.\
+same data sometimes do.
+
+Anti-slop rules — the dialogue must not sound AI-generated. These apply to both hosts:
+* No throat-clearing wind-ups. Don't open lines with "Here's the thing," "What's interesting \
+is," "The reality is," "Let's be clear." Just say it.
+* Active voice. Someone does something. Avoid "it's being seen as," "concerns were raised," \
+"the decision emerged."
+* Be concrete. No vague declaratives like "the implications are significant" or "the reasons \
+are structural." Name the specific implication and the specific reason.
+* Drop adverbs and intensifiers — "really," "incredibly," "fundamentally," "massively," \
+"arguably."
+* No "not X, it's Y" contrast constructions. State Y directly.
+* No rule-of-three lists read aloud. Two examples land harder than three.
+* Vary sentence length for real. Some lines three words long, some a full breath. Never settle \
+into a metronome.
+* Cut anything engineered to sound profound — pull-quotes, TED-talk buttons, "and that changes \
+everything" closers. Say it plainly instead.
+* Trust the listener. Skip softening, over-qualification, and hand-holding recaps of what was \
+just said.
+* Don't use "so what does this all mean" or "the bottom line is" as a segue crutch. Move to \
+the point.\
 """
 
 
